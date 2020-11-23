@@ -1,0 +1,38 @@
+<html>
+    <head>
+        <script src="https://sdk.amazonaws.com/js/aws-sdk-2.796.0.min.js"></script>
+    </head>
+    <body>
+        <script>
+            alert("음성을 자동으로 재생하기 위해서는 보안상 최대 한 번 페이지 내에서 액션을 취해야합니다. 페이지를 클릭해주세요.")
+            AWS.config.region = 'ap-northeast-2'; 
+            AWS.config.credentials = new AWS.CognitoIdentityCredentials({IdentityPoolId: 'ap-northeast-2:03db97c9-a857-45f3-be6e-3cf84d6f619b'});
+            const polly = new AWS.Polly({
+                signatureVersion: 'v4',
+                region: 'ap-northeast-2',
+            });
+
+            let params = {
+                'Text': '반가워 친구야~',
+                'OutputFormat': 'mp3',
+                'VoiceId': 'Seoyeon'
+            };
+            let tts = new AWS.Polly.Presigner(params, polly)
+                    
+
+            // Create presigned URL of synthesized speech file
+            tts.getSynthesizeSpeechUrl(params, function(error, url) {
+                if (error) {
+                } else {
+                    setTimeout(()=>{
+                        console.log("실행")
+                        let audio = new Audio(url)
+                        audio.play()
+                            .then(delete audio);
+                    }, 3000)
+                }
+            })
+        </script>
+        My Polly
+    </body>
+</html>
