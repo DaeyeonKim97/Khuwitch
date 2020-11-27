@@ -21,7 +21,7 @@
 
 ```html
 <script>
-<!-- Polly를 사용하기 위한 자격증명을 설정한다. -->
+// Polly를 사용하기 위한 자격증명을 설정한다.
 AWS.config.region = 'ap-northeast-2'; 
 AWS.config.credentials = new AWS.CognitoIdentityCredentials({IdentityPoolId: 'ap-northeast-2:03db97c9-a857-45f3-be6e-3cf84d6f619b'});
 const polly = new AWS.Polly({
@@ -37,7 +37,7 @@ let params = {
 let tts = new AWS.Polly.Presigner(params, polly)
         
 
-// Create presigned URL of synthesized speech file
+// tts로 변환한 음성 파일을 얻는다.
 tts.getSynthesizeSpeechUrl(params, function(error, url) {
     if (error) {
     } else {
