@@ -1,30 +1,56 @@
-const config = require(__dirname + '/config/config')
+const config = require('./config/config')
 
-const express = require('express');
-const app = express();
-const server = require('http').Server(app);
-const io = require('socket.io')(server);
-const port = process.env.SOCKET_PORT;
+const app = require('express')();
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
+const papago = require('./openAPIs/papago_api')
 
-server.listen(port, () => { console.log(`Listening on port ${port}`) });
+app.set('view engine', 'ejs');
+app.set('views', './views');
 
-io.on('connection', socket => {
-    console.log("connected socketID : ", socket.id);
-    io.to(socket.id).emit('my socket id',{socketId: socket.id});
+let room = ['streamer1', 'streamer2'];
+let a = 0;
 
-    socket.on('enter chatroom', () => {
-        console.log("channel에 입장");
-        socket.broadcast.emit('receive chat', {type: "alert", chat: "누군가가 입장하였습니다.", regDate: Date.now()});
-    })
+app.get('/', (req, res) => {
+    res.render('chat');
+});
 
-    socket.on('send voice', data => {
-        console.log(`${socket.id} : ${data.chat}`);
-        io.emit('send voice', data);
-    })
-
-    socket.on('leave chatroom', data => {
-        console.log('leave chatroom ', data);
-        socket.broadcast.emit('receive chat', {type: "alert", chat: "누군가가 퇴장하였습니다.", regDate: Date.now()});
-    })
-   
+app.get('/list',(req,res) => {
+    res.send(room);
 })
+
+app.post('/add',(req,res)=>{
+    room.append(req.body.streamer);
+    res.send(req.body.streamer);
+})
+
+
+io.on('connection', (socket) => {
+    socket.on('disconnect', () => {
+        console.log('user disconnected');
+    });
+
+    socket.on('leaveRoom', (num,name) => {
+        socket.leave(room[num], () => {
+            console.log('Someone leave a ' + room[num]);
+            io.to(room[num]).emit('leaveRoom', num ,name);
+        });
+    });
+
+    socket.on('joinRoom', (num,name) => {
+        socket.join(room[num], () => {
+            console.log('Someone join a ' + room[num]);
+            io.to(room[num]).emit('joinRoom', num ,name);
+        });
+    });
+
+    socket.on('chat message', (num,name, msg) => {
+        papago.detect(msg,io,room[num]);
+        io.to(room[a]).emit('chat message', name, msg);
+    });
+});
+
+
+http.listen(process.env.SOCKET_PORT, () => {
+    console.log(`Connect at ${process.env.SOCKET_PORT}`);
+});
