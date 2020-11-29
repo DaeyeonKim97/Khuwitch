@@ -6,7 +6,7 @@ const io = require('socket.io')(http);
 const papago = require('./openAPIs/papago_api')
 
 app.set('view engine', 'ejs');
-app.set('views', './views');
+app.set('views', './testviews');
 
 let room = ['streamer1', 'streamer2'];
 let a = 0;
