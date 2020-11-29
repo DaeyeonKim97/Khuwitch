@@ -2,7 +2,7 @@
   "name": "khuwitch-server",
   "version": "1.0.0",
   "description": "twitch translator chatbot & tts server dev",
-  "main": "app.js",
+  "main": "socket_server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
