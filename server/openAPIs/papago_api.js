@@ -46,3 +46,43 @@ exports.detect = (message,io,room) => {
             }
         });
 }
+
+exports.transchat = (message, lang, client, target) => {
+    request.post(
+        {
+            url: PAPAGO_URL,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                'X-Naver-Client-Id': `${PAPAGO_ID}`,
+                'X-Naver-Client-Secret': `${PAPAGO_SECRET}`
+            },
+            body: `source=${lang}&target=ko&text=` + message,
+            json:true
+        },(error, response, body) => {
+            if(!error && response.statusCode == 200) {
+                var Translated = body.message.result.translatedText;
+                client.say(target, "(번역) ", Translated);
+            }
+        });
+}
+
+exports.detectchat = (message, client,target) => {
+    request.post(
+        {
+            url: dPAPAGO_URL,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                'X-Naver-Client-Id': `${PAPAGO_ID}`,
+                'X-Naver-Client-Secret': `${PAPAGO_SECRET}`
+            },
+            body: `query=` + message,
+            json:true
+        },(error, response, body) => {
+            if(!error && response.statusCode == 200) {
+                var lang = body.langCode;
+                if(lang != 'ko'){
+                    this.trans(message,lang,client,target)
+                }
+            }
+        });
+}
