@@ -86,12 +86,11 @@ client.connect();
 function onMessageHandler (target, context, msg, self) {
   if (self) { return; } // Ignore messages from the bot
   
-  io.to(target.replace('#','')).emit('chat message',context["display-name"],msg)
-  papago.detectchat(msg, client, io, target);
-
-
-  if(msg == '척척학사2'){
-    client.say(target, `안녕하세요 척척학사의 방송입니다.`);
+  if (msg.startsWith('!')){
+  }
+  else{
+    io.to(target.replace('#','')).emit('chat message',context["display-name"],msg)
+    papago.detectchat(msg, client, io, target);
   }
   
 }
