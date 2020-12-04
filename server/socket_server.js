@@ -3,7 +3,8 @@ const config = require('./config/config')
 const app = require('express')();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
-const papago = require('./openAPIs/papago_api')
+const papago = require('./openAPIs/papago_api');
+
 // const tmi = require('tmi.js');
 // // Define configuration options
 // var opts = {
@@ -19,11 +20,12 @@ const papago = require('./openAPIs/papago_api')
 // const client = new tmi.client(opts); //twitch chatbot client
 
 app.set('view engine', 'ejs');
-app.set('views', './testviews');
+app.set('views', './server/testviews');
 
 let room = ['streamer1', 'streamer2'];
 // client.opts.channels;
 let a = 0;
+
 
 app.get('/', (req, res) => {
     res.render('chat');
