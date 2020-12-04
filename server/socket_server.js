@@ -20,7 +20,7 @@ const papago = require('./openAPIs/papago_api');
 // const client = new tmi.client(opts); //twitch chatbot client
 
 app.set('view engine', 'ejs');
-app.set('views', './server/testviews');
+app.set('views', './testviews');
 
 let room = ['streamer1', 'streamer2'];
 // client.opts.channels;
