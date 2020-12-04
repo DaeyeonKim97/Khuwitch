@@ -9,6 +9,8 @@
 
 ## 실행방법
 
+>.env파일을 만듭니다.
+
 ```
     cd server
     npm install pkg.json --save
