@@ -50,8 +50,8 @@
 </head>
 <body>
 <select>
-  <option value="streamer1">streamer1</option>
-  <option value="streamer2">streamer2</option>
+  <option value="nnonuu">nnonuu</option>
+  <option value="bachelorchuckchuck">bachelorchuckchuck</option>
 </select>
 <ul id="messages"></ul>
 <form action="">
@@ -64,21 +64,22 @@
   $(() => {
     const name = prompt('What your name');
     const socket = io();
-    let room = ['streamer1', 'streamer2'];
+    let room = ['nnonuu', 'bachelorchuckchuck'];
+    var streamer = room[0]
     let num = 0;
-
-    socket.emit('joinRoom', num, name);
+    socket.emit('joinRoom', streamer, name);
 
     $('select').change(() => {
-      socket.emit('leaveRoom', num, name);
+      socket.emit('leaveRoom', room[num], name);
       num++;
       num = num % 2;
-      socket.emit('joinRoom', num, name);
+      $('#messages').append($('<li>').text(num + room[num]));
+      socket.emit('joinRoom', room[num], name);
     });
 
 
     $('form').submit(() => {
-      socket.emit('chat message', num, name, $('#m').val());
+      socket.emit('chat message', streamer, name, $('#m').val());
       $('#m').val('');
       return false;
     });
@@ -88,14 +89,14 @@
         msg));
     });
 
-    socket.on('leaveRoom', (num, name) => {
+    socket.on('leaveRoom', (streamer, name) => {
       $('#messages').append($('<li>').text(name + '    leaved '
-        + room[num] + ' :('));
+        + streamer + ' :('));
     });
 
-    socket.on('joinRoom', (num, name) => {
+    socket.on('joinRoom', (streamer, name) => {
       $('#messages').append($('<li>').text(name + '    joined '
-        + room[num] + ':)'));
+        + streamer + ':)'));
     });
   });
 </script>
