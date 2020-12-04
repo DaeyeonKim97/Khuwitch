@@ -7,3 +7,11 @@
 > nodejs서버와 테스트용으로 만든 ejs를 결합.
 > papago API와 연동하여 챗이 emit하면 한국어인지 판단하고 해당 room에 번역된 채팅을 뿌려줌
 
+## 실행방법
+
+```
+    cd server
+    npm install pkg.json --save
+    npm start
+```
+
