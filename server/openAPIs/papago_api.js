@@ -48,45 +48,23 @@ exports.detectchat = (message, client, io, target) => {
         });
 }
 
-
-// exports.trans = (message, lang, io, room) => {
-//     request.post(
-//         {
-//             url: PAPAGO_URL,
-//             headers: {
-//                 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-//                 'X-Naver-Client-Id': `${PAPAGO_ID}`,
-//                 'X-Naver-Client-Secret': `${PAPAGO_SECRET}`
-//             },
-//             body: `source=${lang}&target=ko&text=` + message,
-//             json:true
-//         },(error, response, body) => {
-//             if(!error && response.statusCode == 200) {
-//                 var Translated = body.message.result.translatedText;
-//                 io.to(room).emit('chat message', "trans", Translated);
-//             }
-//         });
-// }
-
-
-// exports.detect = (message,io,room) => {
-//     request.post(
-//         {
-//             url: dPAPAGO_URL,
-//             headers: {
-//                 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-//                 'X-Naver-Client-Id': `${PAPAGO_ID}`,
-//                 'X-Naver-Client-Secret': `${PAPAGO_SECRET}`
-//             },
-//             body: `query=` + message,
-//             json:true
-//         },(error, response, body) => {
-//             if(!error && response.statusCode == 200) {
-//                 var lang = body.langCode;
-//                 if(lang != 'ko'){
-//                     this.trans(message,lang,io,room)
-//                 }
-//             }
-//         });
-// }
+exports.trans = (message, client,io, target) => {
+    request.post(
+        {
+            url: PAPAGO_URL,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                'X-Naver-Client-Id': `${PAPAGO_ID}`,
+                'X-Naver-Client-Secret': `${PAPAGO_SECRET}`
+            },
+            body: `source=ko&target=en&text=` + message,
+            json:true
+        },async (error, response, body) => {
+            if(!error && response.statusCode == 200) {
+                var Translated = await body.message.result.translatedText;
+                client.say(target, "(Trans) "+Translated);
+                io.to(target.replace('#','')).emit('chat message', "Trans", Translated);
+            }
+        });
+}
 

@@ -13,12 +13,13 @@ var opts = {
       username: process.env.BOT_USERNAME,
       password: process.env.OAUTH_TOKEN
     },
-    channels: ["nnonuu"]
+    channels: ["tmwardo"]
   };
 // Create a client with our options
 var client = new tmi.client(opts); //twitch chatbot client
 
 var bodyParser = require('body-parser');
+const { default: Axios } = require('axios');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.set('view engine', 'ejs');
@@ -33,22 +34,59 @@ app.get('/', (req, res) => {
 });
 
 app.get('/list',(req,res) => {
-    res.send(client.channels);
+    var result = []
+    for (var i = 0; i<client.channels.length; i++){
+      result.push(client.channels[i].slice(1))
+    }
+    res.send(result)
+});
+
+app.post('/jointest',async (req,res)=>{
+  // requests.post(`https://id.twitch.tv/oauth2/token?client_id=<클라이언트 ID>&client_secret=${process.env.TOKEN}&grant_type=client_credentials`).json()
+  JoinChannel(req.body.streamer);
+  res.send(req.body.streamer)
+});
+
+////////////////////////oauth////////////////////////
+const axios = require('axios')
+app.get('/oauth',(req,res)=>{
+    let codeAddr = `https://id.twitch.tv/oauth2/authorize?response_type=code&approval_prompt=auto&redirect_uri=${process.env.HOST_URI+':'+process.env.SOCKET_PORT}/join&client_id=${process.env.TWITCH_CLIENT}`
+
+    res.redirect(codeAddr)
+});
+app.get('/join', async (req,res)=>{
+    let code = req.query.code
+    let reqAddr = `https://id.twitch.tv/oauth2/token?client_id=${process.env.TWITCH_CLIENT}&client_secret=${process.env.TWITCH_SECRET}&code=${code}&grant_type=authorization_code&redirect_uri=${process.env.HOST_URI+':'+process.env.SOCKET_PORT}/test`
+    axios.post(reqAddr).then(resp1=>{
+        axios.get('https://id.twitch.tv/oauth2/validate',
+              {
+                  headers:{
+                      Authorization : "Bearer "+ resp1.data.access_token
+                  }
+              }
+        ).then(resp2=>{
+            JoinChannel(resp2.data.login)
+            res.send("Joinned "+resp2.data.login)
+        })
+    })
+    
 })
 
-app.post('/add',async (req,res)=>{
-  
-  /// 봇을 새로운 채널에 추가
-    await client.action(req.body.streamer,'Khuwitchbot이 입장');
-    await opts.channels.push('#'+req.body.streamer);
+app.get('/test',(req,res)=>{
+    res.send("")
+})
+////////////////////////oauth////////////////////////
+
+
+async function JoinChannel(streamer){
+    await client.action(streamer,'KhuwitchBot 두두등장');
+    await opts.channels.push('#'+streamer);
     await delete client;
     client = await new tmi.client(opts);
     client.on('message', onMessageHandler);
     client.on('connected', onConnectedHandler);
     client.connect();
-    res.send(req.body.streamer)
-  ///
-})
+} 
 
 
 io.on('connection', (socket) => {
@@ -91,15 +129,15 @@ client.on('connected', onConnectedHandler);
 
 // Connect to Twitch:
 client.connect();
-console.log(client);
 
 // Called every time a message comes in
 function onMessageHandler (target, context, msg, self) {
   if (self) { return; } // Ignore messages from the bot
-  console.log("chatdetected")
-
   if (msg.startsWith('!')){
-    return;
+    if(msg.startsWith('!번역')){
+      io.to(target.replace('#','')).emit('chat message',context["display-name"],msg.slice(4))
+      papago.trans(msg.slice(4), client, io, target)
+    }
   }
   else if(context["display-name"] == "빵_떡" 
           || context["display-name"]=="Nightbot"
