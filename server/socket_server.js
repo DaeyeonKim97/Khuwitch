@@ -5,6 +5,7 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const papago = require('./openAPIs/papago_api');
 
+
 const tmi = require('tmi.js');
 // Define configuration options
 var opts = {
@@ -12,17 +13,17 @@ var opts = {
       username: process.env.BOT_USERNAME,
       password: process.env.OAUTH_TOKEN
     },
-    channels: [
-      'nnonuu'
-    ]
+    channels: ["nnonuu"]
   };
 // Create a client with our options
-const client = new tmi.client(opts); //twitch chatbot client
+var client = new tmi.client(opts); //twitch chatbot client
 
+var bodyParser = require('body-parser');
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 app.set('view engine', 'ejs');
 app.set('views', './testviews');
 
-let room = ['nnonuu', 'bachelorchuckchuck'];
 // client.opts.channels;
 let a = 0;
 
@@ -32,12 +33,21 @@ app.get('/', (req, res) => {
 });
 
 app.get('/list',(req,res) => {
-    res.send(room);
+    res.send(client.channels);
 })
 
-app.post('/add',(req,res)=>{
-    room.append(req.body.streamer);
-    res.send(req.body.streamer);
+app.post('/add',async (req,res)=>{
+  
+  /// 봇을 새로운 채널에 추가
+    await client.action(req.body.streamer,'Khuwitchbot이 입장');
+    await opts.channels.push('#'+req.body.streamer);
+    await delete client;
+    client = await new tmi.client(opts);
+    client.on('message', onMessageHandler);
+    client.on('connected', onConnectedHandler);
+    client.connect();
+    res.send(req.body.streamer)
+  ///
 })
 
 
@@ -81,12 +91,20 @@ client.on('connected', onConnectedHandler);
 
 // Connect to Twitch:
 client.connect();
+console.log(client);
 
 // Called every time a message comes in
 function onMessageHandler (target, context, msg, self) {
   if (self) { return; } // Ignore messages from the bot
-  
+  console.log("chatdetected")
+
   if (msg.startsWith('!')){
+    return;
+  }
+  else if(context["display-name"] == "빵_떡" 
+          || context["display-name"]=="Nightbot"
+          || context["display-name"]=="싹뚝"){
+    return;
   }
   else{
     io.to(target.replace('#','')).emit('chat message',context["display-name"],msg)

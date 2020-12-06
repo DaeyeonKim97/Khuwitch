@@ -50,8 +50,8 @@
 </head>
 <body>
 <select>
+  <option value="tmwardo">tmwardo</option>
   <option value="nnonuu">nnonuu</option>
-  <option value="bachelorchuckchuck">bachelorchuckchuck</option>
 </select>
 <ul id="messages"></ul>
 <form action="">
@@ -64,7 +64,7 @@
   $(() => {
     const name = prompt('What your name');
     const socket = io();
-    let room = ['nnonuu', 'bachelorchuckchuck'];
+    let room = ['tmwardo','nnonuu'];
     var streamer = room[0]
     let num = 0;
     socket.emit('joinRoom', streamer, name);
@@ -78,11 +78,11 @@
     });
 
 
-    $('form').submit(() => {
-      socket.emit('chat message', streamer, name, $('#m').val());
-      $('#m').val('');
-      return false;
-    });
+    // $('form').submit(() => {
+    //   socket.emit('chat message', streamer, name, $('#m').val());
+    //   $('#m').val('');
+    //   return false;
+    // });
 
     socket.on('chat message', (name, msg) => {
       $('#messages').append($('<li>').text(name + '  :  ' +
