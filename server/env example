@@ -1,6 +1,9 @@
-SOCKET_PORT=
-TWITCH_TOKEN=
-PAPAGO_ID=
-PAPAGO_SECRET=
-BOT_USERNAME= 
-OAUTH_TOKEN=
+
+HOST_URI = [twitch end point url]
+SOCKET_PORT= [backend socket server port]
+TWITCH_CLIENT= [twitch dev client id]
+TWITCH_SECRET= [twitch dev client id secret]
+PAPAGO_ID= [papago client id]
+PAPAGO_SECRET= [papago client secret]
+BOT_USERNAME= [twitch bot name]
+OAUTH_TOKEN= [twitch user oauth token]
